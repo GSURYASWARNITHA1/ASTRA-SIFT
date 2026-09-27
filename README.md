@@ -86,26 +86,16 @@ A harder environment containing changes such as:
 The policy weights were **not retrained** for the OOD evaluation.
 
 ---
+## 📁 Project Structure
+
+```text
 ASTRA-SIFT/
-│
-├── README.md
 ├── app.py
-├── requirements.txt
-│
-├── demo/
-│   └── demo files
-│
 ├── experiments/
-│   ├── experiment_1
-│   ├── experiment_2
-│   └── final_evaluation.py
-│
-└── results/
-    └── figures/
-        ├── catastrophe_recall.png
-        ├── mean_reward.png
-        ├── regret_vs_oracle.png
-        └── demo_graph.png
+├── demo/
+└── results/figures/
+
+
 
 # 📊 Experimental Results
 
