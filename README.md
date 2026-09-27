@@ -37,7 +37,9 @@ The interactive demo allows you to:
 
 ## 🎥 Demo Video
 
-👉 **[Watch the ASTRA-SIFT Demo Video](YOUR_VIDEO_LINK_HERE)**
+👉 https://drive.google.com/file/d/1G1_nT4E70yJS2MbMNat-uogt1qoNFwBq/view?usp=drivesdk
+
+
 
 
 ---
