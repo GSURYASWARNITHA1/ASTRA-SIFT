@@ -1,72 +1,219 @@
-# ASTRA-SIFT — Streamlit Demo App
+# ASTRA-SIFT 🚀
 
-Risk-aware satellite information selection under a limited communication budget.
+### Risk-Aware Satellite Information Selection Under Limited Communication Bandwidth
 
-This is a **synthetic, proof-of-concept demonstration**. It does not use real
-satellite imagery, real satellite hardware, or a real communication link. It
-does not change, retrain, or re-tune the underlying ASTRA-SIFT selection
-logic in any way — this app only adds a web UI on top of the exact same
-functions and the exact same trained-policy training call already used
-elsewhere in the project.
+**ASTRA-SIFT** is a research prototype exploring how a satellite could decide **which observations are worth transmitting when it cannot send everything to Earth**.
 
-## Folder contents
+A simple approach would be to select the observations with the highest **importance** scores. However, an observation can have low ordinary importance while still being unusual, uncertain, risky, or potentially high-consequence.
 
-```
-astra_sift_app/
-├── app.py                          <- the Streamlit application
-├── requirements.txt                <- Python dependencies
-├── README.md                       <- this file
+ASTRA-SIFT therefore evaluates observations using multiple signals:
+
+- **Importance** — how useful the observation appears to be
+- **Rarity** — how unusual it is
+- **Novelty** — how different it is from other observations
+- **Uncertainty** — how uncertain the system is about it
+- **Risk** — estimated potential consequence
+- **Redundancy** — whether similar information has already been selected
+
+The goal is simple:
+
+> **When communication capacity is limited, avoid automatically throwing away information that may turn out to matter.**
+
+---
+
+## 🚀 Live Demo
+
+👉 https://astra-sift-esn4evkccjvz2qhwaj6cn5.streamlit.app/
+
+The interactive demo allows you to:
+
+- Generate a simulated satellite observation pass
+- Compare **Top-K importance** against **ASTRA-SIFT**
+- See which observations each method selects
+- Check whether a critical observation is preserved
+- View the experimental evaluation graphs
+
+---
+
+## 🎥 Demo Video
+
+👉 **[Watch the ASTRA-SIFT Demo Video](YOUR_VIDEO_LINK_HERE)**
+
+The video provides a short walkthrough of the problem, approach, live demo, and results.
+
+---
+
+# 🧠 What I Built
+
+The project was developed in three main stages.
+
+### 1. Baseline Selection
+
+A **Top-K importance** strategy selects the observations with the highest importance scores.
+
+In simple terms:
+
+> "Transmit the observations that look most important."
+
+This provides a baseline for comparison.
+
+### 2. ASTRA-SIFT Risk-Aware Selection
+
+ASTRA-SIFT combines multiple signals instead of relying only on importance.
+
+It also considers **redundancy between selected observations**, making the selection process batch-aware.
+
+The policy uses a learned linear utility function and a simple black-box hill-climbing search to learn its weights.
+
+### 3. Robustness Evaluation
+
+The trained policy was evaluated in two environments:
+
+**In-Distribution**
+
+An environment from the same synthetic distribution family used during training.
+
+**Out-of-Distribution (OOD)**
+
+A harder environment containing changes such as:
+
+- Different rare-event rates
+- Additional sensor noise
+- A noisier normal background
+- Lower probability of rare events being truly consequential
+- "Stealthy" high-consequence events with low rarity and novelty
+
+The policy weights were **not retrained** for the OOD evaluation.
+
+---
+ASTRA-SIFT/
+│
+├── README.md
+├── app.py
+├── requirements.txt
+│
+├── demo/
+│   └── demo files
+│
+├── experiments/
+│   ├── experiment_1
+│   ├── experiment_2
+│   └── final_evaluation.py
+│
 └── results/
     └── figures/
-        ├── catastrophe_recall.png  <- from the full 200-episode evaluation
-        ├── mean_reward.png         <- from the full 200-episode evaluation
-        └── regret_vs_oracle.png    <- from the full 200-episode evaluation
-```
+        ├── catastrophe_recall.png
+        ├── mean_reward.png
+        ├── regret_vs_oracle.png
+        └── demo_graph.png
 
-The three PNGs under `results/figures/` are the **actual saved figures** from
-the previously reported in-distribution / out-of-distribution evaluation —
-they are bundled here so the app can display them, but they are not
-regenerated or recomputed by this app.
+# 📊 Experimental Results
 
-## Running it locally
+The experiments are based on **synthetic satellite observations**, not real satellite data.
 
-1. **Install Python 3.9+** if you don't already have it.
+| Evaluation | Method | Catastrophe Recall | Mean Reward |
+|---|---|---:|---:|
+| In-Distribution | Top-K importance | 0.4% | -0.204 |
+| In-Distribution | ASTRA-SIFT | **99.6%** | **1.073** |
+| Out-of-Distribution | Top-K importance | 0.8% | -0.188 |
+| Out-of-Distribution | ASTRA-SIFT | **97.7%** | **0.909** |
 
-2. **(Recommended) create a virtual environment:**
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate        # on Windows: venv\Scripts\activate
-   ```
+Within this controlled simulation, ASTRA-SIFT selected substantially more simulated high-consequence observations than the Top-K importance baseline.
 
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+The same trained policy also retained most of this advantage under the harder OOD conditions.
 
-4. **Run the app**, from inside the `astra_sift_app/` folder (so the
-   `results/figures/` path resolves correctly):
-   ```bash
-   streamlit run app.py
-   ```
+---
 
-5. Streamlit will print a local URL, typically:
-   ```
-   Local URL: http://localhost:8501
-   ```
-   Open that in your browser.
+# 📈 Evaluation Graphs
 
-6. Click **"Run Satellite Pass Demo"** to generate the one simulated
-   satellite pass, see what Top-K importance vs. ASTRA-SIFT would each
-   transmit, whether the critical observation was preserved, the comparison
-   chart, and (if present) the three final evaluation figures.
+### Catastrophe Recall
 
-## Notes
+This measures how many simulated high-consequence events were successfully selected for transmission.
 
-- The "trained policy" used here is produced by the exact same training call
-  (same seed, same hyperparameters) as the one reported in the final
-  experiment — nothing is retrained or re-tuned inside this app.
-- The 15-observation demo pass is a fixed, hand-built illustration, not a new
-  experiment. The actual measured recall/regret numbers come from the
-  200-episode evaluation figures shown at the bottom of the page.
-- If `results/figures/` is missing or empty, the app still runs — it will
-  just show a note that those figures weren't found instead of an image.
+![Catastrophe Recall](results/figures/catastrophe_recall.png)
+
+### Mean Reward
+
+This shows the average simulated reward obtained by each selection strategy.
+
+![Mean Reward](results/figures/mean_reward.png)
+
+### Regret vs Oracle
+
+This shows how far each strategy is from an evaluation-only oracle.
+
+![Regret vs Oracle](results/figures/regret_vs_oracle.png)
+
+---
+
+# 🔬 Key Demonstration
+
+The demo includes a deliberately constructed case containing:
+
+- Several ordinary observations with higher importance
+- One observation with low ordinary importance
+- High rarity and novelty
+- High uncertainty and risk
+- A limited transmission budget
+
+The **Top-K importance** strategy drops the critical observation.
+
+**ASTRA-SIFT selects it.**
+
+A second "stealthy" scenario makes the problem harder by giving the critical observation **low rarity and low novelty**, while retaining high uncertainty and risk.
+
+This tests whether the system is simply relying on obvious anomaly signals.
+
+---
+
+# ⚙️ Technical Approach
+
+The selection policy uses a sequential greedy strategy.
+
+For each candidate observation, the system considers:
+
+```text
+importance
++ rarity
++ novelty
++ uncertainty
++ risk
+- redundancy
+
+# ⚙️ Technologies
+
+Python
+NumPy
+Matplotlib
+Streamlit
+
+# 🔭 Scope & Current Prototype
+
+ASTRA-SIFT is currently a **synthetic research prototype** designed to validate the core selection concept in a controlled environment.
+
+The current implementation uses simulated satellite observations rather than:
+
+- Real satellite imagery
+- Real satellite sensor data
+- Real satellite hardware
+- Real communication links
+- Real ground-station infrastructure
+- Real-world hazard or consequence models
+
+The reported results therefore demonstrate the behavior of the proposed selection approach **within the simulation** rather than real-world satellite performance.
+
+The next stage of the project would be to evaluate the approach using real satellite observations or richer satellite-data representations.
+
+
+## Why I Built This
+
+This project explores a broader problem in intelligent systems:
+
+When a system cannot process, store, or transmit everything, how should it decide what information must not be missed?
+
+ASTRA-SIFT is an initial exploration of combining risk, uncertainty, novelty, rarity, importance, and redundancy to make that decision more robust.
+
+👤 Author
+GUNUPUDI SURYA SWARNITHA
+Computer Science & AI/ML Student
+Interested in AI, Machine Learning, Quantum Computing, Robotics, and Deep-Tech Systems.
