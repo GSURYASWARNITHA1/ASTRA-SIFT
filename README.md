@@ -39,7 +39,6 @@ The interactive demo allows you to:
 
 👉 **[Watch the ASTRA-SIFT Demo Video](YOUR_VIDEO_LINK_HERE)**
 
-The video provides a short walkthrough of the problem, approach, live demo, and results.
 
 ---
 
@@ -87,13 +86,15 @@ The policy weights were **not retrained** for the OOD evaluation.
 
 ---
 ## 📁 Project Structure
-
-```text
 ASTRA-SIFT/
+├── .devcontainer/
+├── README.md
 ├── app.py
-├── experiments/
+├── requirements.txt
 ├── demo/
-└── results/figures/
+├── experiments/
+└── results/
+    └── figures/
 
 
 
@@ -162,7 +163,6 @@ The selection policy uses a sequential greedy strategy.
 
 For each candidate observation, the system considers:
 
-```text
 importance
 + rarity
 + novelty
@@ -204,6 +204,7 @@ When a system cannot process, store, or transmit everything, how should it decid
 ASTRA-SIFT is an initial exploration of combining risk, uncertainty, novelty, rarity, importance, and redundancy to make that decision more robust.
 
 👤 Author
+
 GUNUPUDI SURYA SWARNITHA
 Computer Science & AI/ML Student
 Interested in AI, Machine Learning, Quantum Computing, Robotics, and Deep-Tech Systems.
